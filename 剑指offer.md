@@ -238,3 +238,30 @@ public:
     }
 };
 ```
+---
+### [剑指 Offer 04. 二维数组中的查找](https://leetcode-cn.com/problems/er-wei-shu-zu-zhong-de-cha-zhao-lcof/)
+
+```cpp
+class Solution {
+public:
+    bool findNumberIn2DArray(vector<vector<int>>& matrix, int target) {
+        if (matrix.empty() or matrix[0].empty()){
+            return false;
+        }
+        int m = matrix.size(), n = matrix[0].size();
+        int x = 0, y = n-1; // 右上角开始搜索
+        while ( x >= 0 && x <= m-1 && y >= 0 && y <= n-1){
+            if (matrix[x][y] == target){
+                return true;
+            }
+            else if (matrix[x][y] > target){
+                y -= 1; // 横纵坐标变化需注意，不能弄反
+            }
+            else{
+                x += 1;
+            }
+        }
+        return false;
+    }
+};
+```
