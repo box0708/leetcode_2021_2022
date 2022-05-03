@@ -98,6 +98,7 @@ public:
  * int param_4 = obj->min();
  */
 ```
+<<<<<<< Updated upstream
 
 --- 
 
@@ -262,6 +263,72 @@ public:
             }
         }
         return false;
+=======
+---
+### [剑指 Offer 35. 复杂链表的复制](https://leetcode-cn.com/problems/fu-za-lian-biao-de-fu-zhi-lcof/)
+```cpp
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+*/
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        if (head == NULL){
+            return NULL;
+        }
+        /*
+            此处注掉，因为链表只有一个节点且random指向自身的时候
+            单独列出会导致结果的random指向了原链表节点，不AC
+        if (head->next == NULL){
+            Node* res = new Node(head->val);
+            res->random = head->random;
+            return res;
+        }
+        */
+        // 复制链表
+        // 注意：用for替换while循环，避免bug
+        for (Node* cur = head; cur != NULL ; cur = cur->next->next){
+            Node* newNode = new Node(cur->val);
+            newNode->next = cur->next;
+            cur->next = newNode;
+        }
+        // 处理random指针
+        for (Node* cur = head; cur != NULL ; cur = cur->next->next){
+            Node* nextNode = cur->next;
+            if (cur->random != NULL){
+                nextNode->random = cur->random->next;
+            }
+            else{
+                nextNode->random = NULL;
+            }
+        }
+        // 生成新链表
+        // 这里不要想复杂，就是node->next->next的操作
+        Node* res = head->next;
+        for (Node* cur = head; cur != NULL ; cur = cur->next){
+            Node* nextNode = cur->next;
+            cur->next = cur->next->next;
+            if (nextNode->next != NULL){
+                nextNode->next = nextNode->next->next;
+            } 
+            else{
+                nextNode->next = NULL;
+            }
+        }
+        return res;
+>>>>>>> Stashed changes
     }
 };
 ```
