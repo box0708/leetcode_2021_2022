@@ -98,7 +98,6 @@ public:
  * int param_4 = obj->min();
  */
 ```
-<<<<<<< Updated upstream
 
 --- 
 
@@ -263,7 +262,6 @@ public:
             }
         }
         return false;
-=======
 ---
 ### [剑指 Offer 35. 复杂链表的复制](https://leetcode-cn.com/problems/fu-za-lian-biao-de-fu-zhi-lcof/)
 ```cpp
@@ -328,7 +326,141 @@ public:
             }
         }
         return res;
->>>>>>> Stashed changes
+    }
+};
+```
+---
+### [剑指 Offer 07. 重建二叉树](https://leetcode.cn/problems/zhong-jian-er-cha-shu-lcof/)
+> 输入某二叉树的前序遍历和中序遍历的结果，请构建该二叉树并返回其根节点。
+> 
+> 假设输入的前序遍历和中序遍历的结果中都不含重复的数字。
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        // 二叉树题目，考虑用递归来解
+        int n = preorder.size();
+        return helper(preorder, inorder, 0, n-1, 0, n-1);
+    }
+
+    TreeNode* helper(vector<int>& preorder, vector<int>& inorder, int pl, int pr, int il, int ir){
+        /*
+            四个参数意义：前序遍历起点、终点；中序遍历起点、终点
+        */
+        if (pl > pr){
+            return NULL; // 越界，返回
+        }
+        int root_val = preorder[pl];
+        TreeNode* root = new TreeNode(root_val); // 建立根节点
+        int i = il; // 在中序遍历中，搜索根节点位置，然后分左右子树
+        for ( i = il; i <= ir; i++){
+            if (inorder[i] == root_val){
+                break; // 在中序遍历中找到了根节点的位置
+            }
+        }
+        int cnt = i - il; // 左子树的长度
+        /*
+            前序遍历：根节点 | 左子树 | 右子树
+            中序遍历：左子树 | 根节点 | 右子树
+        */
+        root->left = helper(preorder, inorder, pl+1, pl+cnt, il, il+cnt-1);
+        root->right = helper(preorder, inorder, pl+cnt+1, pr, il+cnt+1, ir);
+        return root;
+    }
+};
+```
+---
+### [剑指 Offer 11. 旋转数组的最小数字](https://leetcode.cn/problems/xuan-zhuan-shu-zu-de-zui-xiao-shu-zi-lcof/)
+> 把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。
+> 
+> 给你一个可能存在 重复 元素值的数组 numbers ，它原来是一个升序排列的数组，并按上述情形进行了一次旋转。请返回旋转数组的最小元素。例如，数组 `[3,4,5,1,2]` 为 `[1,2,3,4,5]` 的一次旋转，该数组的最小值为 1。  
+> 
+> 注意，数组 `[a[0], a[1], a[2], ..., a[n-1]]` 旋转一次 的结果为数组 `[a[n-1], a[0], a[1], a[2], ..., a[n-2]]` 。
+
+```cpp
+class Solution {
+public:
+    int minArray(vector<int>& numbers) {
+        // 用二分查找解题
+        if (numbers.size() == 1){
+            return numbers[0];
+        }
+        int left = 0, right = numbers.size()-1;
+        while ( left < right){
+            int mid = (left+right)/2;
+            if (numbers[mid] > numbers[right]){
+                /*
+                    中间大于右边，说明左半边是升序的
+                    最小值需要到右半边找，收缩左指针
+                */
+                left = mid+1;
+            }
+            else if (numbers[mid] < numbers[right]){
+                /*
+                    中间小于右边，说明目前的右半边递增
+                    需要往回找，收缩右指针
+                */
+                right = mid;
+            }
+            else{
+                // 为了处理相等情况，右指针收缩一位
+                right -= 1;
+            }
+        }
+        return numbers[left];
+    }
+};
+```
+---
+### [剑指 Offer 12. 矩阵中的路径](https://leetcode.cn/problems/ju-zhen-zhong-de-lu-jing-lcof/)
+> 给定一个 `m x n` 二维字符网格 `board` 和一个字符串单词 `word` 。如果 `word` 存在于网格中，返回 `true` ；否则，返回 `false` 。
+> 
+> 单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
+
+回溯 + DFS
+
+```cpp
+class Solution {
+public:
+    bool exist(vector<vector<char>>& board, string word) {
+        //char[] chars = word.toCharArray();
+        for ( int x=0; x < board.size(); x++){
+            for ( int y=0; y < board[0].size(); y++){
+                if (helper(board, word, x, y, 0)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    bool helper(vector<vector<char>>& board, string word, int x, int y, int idx){
+        if (x < 0 || x >= board.size() || y < 0 || y >= board[0].size() ){
+            return false; // 越界
+        }
+        if (board[x][y] != word[idx]){
+            return false; // 字符不匹配，false
+        }
+        if (idx == word.size()-1){
+            return true; // 遍历结束
+        }
+        board[x][y] = '*';
+
+        bool res = helper(board, word, x+1, y, idx+1) ||
+                    helper(board, word, x-1, y, idx+1) ||
+                    helper(board, word, x, y+1, idx+1) ||
+                    helper(board, word, x, y-1, idx+1);
+        board[x][y] = word[idx];
+        return res;
     }
 };
 ```
