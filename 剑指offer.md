@@ -464,3 +464,71 @@ public:
     }
 };
 ```
+---
+
+### [剑指 Offer 13. 机器人的运动范围](https://leetcode.cn/problems/ji-qi-ren-de-yun-dong-fan-wei-lcof/)
+> 地上有一个m行n列的方格，从坐标 `[0,0]` 到坐标 `[m-1,n-1]` 。一个机器人从坐标 [0, 0] 的格子开始移动，它每次可以向左、右、上、下移动一格（不能移动到方格外），也不能进入行坐标和列坐标的数位之和大于k的格子。例如，当k为18时，机器人能够进入方格 [35, 37] ，因为3+5+3+7=18。但它不能进入方格 [35, 38]，因为3+5+3+8=19。请问该机器人能够到达多少个格子？
+
+```cpp
+class Solution {
+public:
+    int movingCount(int m, int n, int k) {
+        vector<vector<bool>> visited(m, vector<bool>(n, false));
+        return helper(0, 0, m, n, k, visited);
+    }
+
+    int helper(int x, int y, int m, int n, int k, vector<vector<bool>>& visited){
+        // 此处的引用传值必须注意
+        if ( x < 0 || x >= m 
+                || y < 0 || y >= n 
+                || (getDigitSum(x) + getDigitSum(y) > k) || visited[x][y]){
+            return 0;
+        }
+        visited[x][y] = true;
+        return 1 + helper(x+1, y, m, n, k, visited) + helper(x-1, y, m, n, k, visited)
+                    + helper(x, y+1, m, n, k, visited) + helper(x, y-1, m, n, k, visited);
+    }
+
+    int getDigitSum(int i){
+        // 按位数求和
+        int sum = 0;
+        while (i != 0){
+            sum += i % 10;
+            i /= 10;
+        }
+        return sum;
+    }
+};
+```
+---
+### [剑指 Offer 14- I. 剪绳子](https://leetcode.cn/problems/jian-sheng-zi-lcof/)
+> 给你一根长度为 n 的绳子，请把绳子剪成整数长度的 m 段（m、n都是整数，n>1并且m>1），每段绳子的长度记为 `k[0],k[1]...k[m-1]` 。请问 `k[0]*k[1]*...*k[m-1]` 可能的最大乘积是多少？例如，当绳子的长度是8时，我们把它剪成长度分别为2、3、3的三段，此时得到的最大乘积是18。
+
+```cpp
+class Solution {
+public:
+    int cuttingRope(int n) {
+        if (n<3){
+            return 1; // 最大：1+1=2
+        }
+        if (n==3){
+            return 2; // 最大：1+2=3
+        }
+
+        vector<int> dp(n+1, 0); // dp[n]：长度为n的绳子产生的最大乘积
+        for ( int i=0; i <= n; i++){
+            dp[i] = i; //  初始状态，每段绳子切成一段，最大乘积是本身
+        }
+        for ( int i=2; i <= n; i++){
+            for ( int j=1; j < i; j++ ){
+                // dp[i]        初始状态
+                // j*(i-j)      只剪一下，分成两段
+                // j * dp[i-j   剪不只一下。一段长为j，直接乘另一端的最大乘积
+                dp[i] = max(dp[i], max( j*(i-j), j * dp[i-j] ) );
+            }
+        }
+        return dp[n];
+    }
+};
+```
+
